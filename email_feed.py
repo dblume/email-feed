@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import sys
 import os
 import time
@@ -8,16 +8,16 @@ import imaplib
 import email
 from email.header import decode_header
 import hashlib
-import cgi
 import cfgreader
 import logging
+import html
 
 # Read in custom configurations
 g_cfg = cfgreader.CfgReader(__file__.replace('.py', '.cfg'))
 
 # These two strings will form the header and individual
 # items of the RSS feed.
-feed_header = """<?xml version="1.0" encoding="iso-8859-1"?>
+feed_header = """<?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
 <title>Emails for %s</title>
@@ -47,11 +47,7 @@ def set_v_print(verbose):
     :param verbose: A bool to determine if v_print will print its args.
     """
     global v_print
-    if verbose:
-        def v_print(*s):
-            print ' '.join([i.encode('utf8') for i in s])
-    else:
-        v_print = lambda *s: None
+    v_print = print if verbose else lambda *a, **k: None
 
 
 def write_feed(feed_dir, feed_items):
@@ -60,11 +56,11 @@ def write_feed(feed_dir, feed_items):
     do_move = False
     temp_fname = os.path.join(feed_dir, g_cfg.main.rss_base + '.temp.xml')
     dest_fname = os.path.join(feed_dir, g_cfg.main.rss_base + '.xml')
-    with open(temp_fname, 'wb') as f:
+    with open(temp_fname, 'w', encoding='utf-8') as f:
         f.write(feed_header % (now,))
         for title, url, sent_date in reversed(feed_items):
-            title = cgi.escape(title)
-            guid = hashlib.sha1(title + sent_date).hexdigest()
+            title = html.escape(title)
+            guid = hashlib.sha1(bytes(title + sent_date, 'utf-8')).hexdigest()
             f.write(feed_item % (title,
                                  sent_date,
                                  url,
@@ -93,12 +89,11 @@ def main(feed_dir):
     feed_items = []
     logging.debug("There are %d UNSEEN items." % len(data[0].split()))
     for num in data[0].split():  # For each email message...
-        # status, data = server.fetch(num, '(RFC822)')
         status, data = server.fetch(num, '(BODY.PEEK[HEADER.FIELDS (SUBJECT DATE FROM)])')
         if status != 'OK':
             raise Exception('Fetching message %s resulted in %s' % (num, status))
         logging.debug("Fetched message %s." % num)
-        msg = email.message_from_string(data[0][1])
+        msg = email.message_from_bytes(data[0][1])
         subject = msg['Subject']
         from_addr = msg['From']
         logging.debug("    Subject: %s" % subject)
@@ -136,9 +131,9 @@ if __name__ == '__main__':
 
     try:
         main(web_dir)
-    except Exception, e:
+    except Exception as e:
         exceptional_text = "Exception: " + str(e.__class__) + " " + str(e)
         logging.critical(exceptional_text)
         logging.critical(traceback.format_exc())
-        print exceptional_text
+        print(exceptional_text)
         traceback.print_exc(file=sys.stdout)

@@ -1,7 +1,7 @@
 [![Code Climate](https://codeclimate.com/github/dblume/email-feed/badges/gpa.svg)](https://codeclimate.com/github/dblume/email-feed)
 [![Issue Count](https://codeclimate.com/github/dblume/email-feed/badges/issue_count.svg)](https://codeclimate.com/github/dblume/email-feed/issues)
 [![License](https://img.shields.io/badge/license-MIT_license-blue.svg)](https://raw.githubusercontent.com/dblume/email-feed/master/LICENSE.txt)
-![python2.x](https://img.shields.io/badge/python-2.x-yellow.svg)
+![python3.x](https://img.shields.io/badge/python-3.x-green.svg)
 
 # email-feed
 
@@ -12,12 +12,12 @@ email-feed is a script that scans email and creates an RSS feed for unread messa
 1. Rename email\_feed.cfg.sample to email\_feed.cfg
 2. Customize the variables in email\_feed.cfg (More on this below.)
 3. Set up a cronjob that runs email\_feed every day.
-4. Set up something to maintain its log file.
+4. Set up something to maintain the size of its log file.
 5. Bob's your uncle.
 
 ## What It Does
 
-The logfile it writes looks something like this:
+It scans an email account and creates an RSS feed for unread messages. The logfile it writes looks something like this:
 
     2012-10-11 13:00  0s OK
     2012-10-10 13:00  1s OK (Wrote 1 new item.)
@@ -61,12 +61,14 @@ This section refers to the mailbox that the script will read to create the feed.
 **user**: The user for the email address to which you've forwarded the NetFlix email.
 **password**: The IMAP password.
 
-### TODO
+## Maintaining the size of the logfile
 
-1. Convert to Python 3
-2. Make feed UTF-8
+You should use the mechanism provided by your operating system. But if you want to roll your own, the following works:
 
-### Is it any good?
+    find $HOME/log -maxdepth 1 -name \*\.log -type f ! -executable -print0 | \
+    xargs -0 -I{} sh -c 'if [ $(wc -l < {}) -gt 100 ]; then TMPF=$(mktemp) && tail -100 {} > $TMPF && mv $TMPF {}; fi'
+
+## Is it any good?
 
 [Yes](https://news.ycombinator.com/item?id=3067434).
 
