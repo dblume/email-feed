@@ -20,15 +20,16 @@ It scans an email account and creates an RSS feed for unread messages. This is u
 
 For each unread email, it'll create a feed item like so:
 
-    <title>
-       [CoinBase] Bitcoin transaction complete.
-    </title>
-    <pubDate>Fri, 16 Nov 2012 07:23:52 +0000 (UTC)</pubDate>
-    <link>https://webmail.yourdomain.com/</link>
-    <guid isPermaLink="false">7aa13ff7fc1542e3c609aa41fbbc6bc61cb1f4e4</guid>
-    <description>
+    <item>
+      <title>
+        [CoinBase] Bitcoin transaction complete.
+      </title>
+      <pubDate>Fri, 16 Nov 2012 07:23:52 +0000 (UTC)</pubDate>
+      <link>https://webmail.yourdomain.com/</link>
+      <guid isPermaLink="false">7aa13ff7fc1542e3c609aa41fbbc6bc61cb1f4e4</guid>
+      <description>
         "[CoinBase] Bitcoin transaction complete." sent on Fri, 16 Nov 2012 07:23
-    </description>
+      </description>
     </item>
 
 The logfile it writes looks something like this:
