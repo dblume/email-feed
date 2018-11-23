@@ -99,8 +99,11 @@ def main(feed_dir):
         logging.debug("    Subject: %s" % subject)
         logging.debug("    From: %s" % from_addr)
         logging.debug("    Date: %s" % msg['Date'])
-        if subject.startswith('=?UTF-'):
-            subject = decode_header(subject)[0][0]
+        codec = 'utf-8'
+        if subject.startswith('=?'):
+            subject, codec = decode_header(subject)[0]
+        if not isinstance(subject, str):
+            subject = subject.decode(codec)
 
         # Append the subject to a list of items
         feed_items.append((subject, 'https://webmail.dreamhost.com/', msg['Date']))
