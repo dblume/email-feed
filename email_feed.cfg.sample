@@ -1,10 +1,10 @@
 [main]
-domain = yourscriptdomain.com
 name = John Doe
-url_base = %(domain)s
+url_base = yourscriptdomain.com
 logfile = log/email_feed.log
 rss_base = email_feed
 [imap]
 mailbox = mail.yourdomain.com
+webmail = https://%(mailbox)s
 user = email@yourdomain.com
 password = mooltipass

@@ -46,13 +46,13 @@ The RSS feed it writes validates at [the feed validation service](http://validat
 email\_feed.cfg looks like this:
 
     [main]
-    domain = yourdomain.com
     name = John Doe
-    url_base = %(domain)s
+    url_base = yourdomain.com
     logfile = logfile.log
     rss_base = email_feed
     [imap]
     mailbox = mail.yourdomain.com
+    webmail = https://%(mailbox)s
     user = email@yourdomain.com
     password = mooltipass
 
@@ -60,7 +60,6 @@ email\_feed.cfg looks like this:
 
 This section refers to stuff like the name and location of the new RSS file.
 
-**domain**: This is the domain that the script resides at and will write the RSS feed to.  
 **name**: The name of the person to whom the NetFlix feed belongs.  
 **url\_base**: The base of the URL that the RSS feed is at.  
 **logfile**: The name of the logfile.  
@@ -72,7 +71,8 @@ Given the example above, the complete URL for the feed would be `http://yourdoma
 
 This section refers to the mailbox that the script will read to create the feed.
 
-**mailbox**: The internet address of the email mailbox.  
+**mailbox**: The IMAP address of the email server.  
+**webmail**: The address of the server's web interface.  
 **user**: The user for the email address to which you've forwarded the NetFlix email.  
 **password**: The IMAP password.
 
