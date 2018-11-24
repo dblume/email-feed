@@ -78,10 +78,11 @@ This section refers to the mailbox that the script will read to create the feed.
 
 ## Maintaining the size of the logfile
 
-You should use the mechanism provided by your operating system. But if you want to roll your own, something like the following will work:
+To restrict the size of your logfile, you should use the mechanism provided by your operating system. But if you want to roll your own, putting something like the following in a cronjob will work, too.
 
-    find $HOME/log -maxdepth 1 -name \*\.log -type f ! -executable -print0 | \
-    xargs -0 -I{} sh -c 'if [ $(wc -l < {}) -gt 100 ]; then TMPF=$(mktemp) && tail -100 {} > $TMPF && mv $TMPF {}; fi'
+    find log/ -maxdepth 1 -name \*\.log -type f ! -executable -print0 | \
+    xargs -0 -I{} sh -c 'MAX=200; if [ $(wc -l < "{}") -gt $MAX ]; then \
+    TMPF=$(mktemp) && tail -$MAX "{}" > $TMPF && chmod --reference="{}" $TMPF && mv $TMPF "{}"; fi'
 
 ## Is it any good?
 
