@@ -11,6 +11,7 @@ import hashlib
 import cfgreader
 import logging
 import html
+from typing import Callable, List, Tuple
 
 # Read in custom configurations
 g_cfg = cfgreader.CfgReader(__file__.replace('.py', '.cfg'))
@@ -39,7 +40,8 @@ feed_item = """<item>
 """
 
 
-def set_v_print(verbose):
+v_print:Callable
+def set_v_print(verbose: bool) -> None:
     """
     Defines the function v_print.
     It prints if verbose is true, otherwise, it does nothing.
@@ -50,7 +52,7 @@ def set_v_print(verbose):
     v_print = print if verbose else lambda *a, **k: None
 
 
-def write_feed(feed_dir, feed_items):
+def write_feed(feed_dir: str, feed_items: List[Tuple[str, str, str]]) -> str:
     """ Given a list of feed_items, write an FSS feed. """
     now = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())
     do_move = False
@@ -75,7 +77,7 @@ def write_feed(feed_dir, feed_items):
     return "Could not update the feed file."
 
 
-def main(feed_dir):
+def main(feed_dir: str) -> None:
     """ Fetch all the unread mail, and make a feed of subject lines.
     """
     start_time = time.time()
