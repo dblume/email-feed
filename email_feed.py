@@ -72,8 +72,7 @@ def write_feed(feed_dir: str, feed_items: List[Tuple[str, str, str]]) -> str:
         do_move = True
     if do_move:
         os.rename(temp_fname, dest_fname)
-        return "OK (You got %d new message%s.)" % \
-               (len(feed_items), len(feed_items) > 1 and "s" or "")
+        return f'OK (You got {len(feed_items)} new message{len(feed_items) > 1 and "s" or ""}.)'
     return "Could not update the feed file."
 
 
@@ -84,28 +83,27 @@ def main(feed_dir: str) -> None:
     try:
         server = imaplib.IMAP4_SSL(g_cfg.imap.mailbox)
     except Exception as e:
-        logging.critical("%2.0fs imaplib.IMAP4_SSL Exception: %s" % \
-            (time.time() - start_time,  str(e)))
+        logging.critical(f"{time.time() - start_time:2.0f}s imaplib.IMAP4_SSL Exception: {str(e)}")
         return
     server.login(g_cfg.imap.user, g_cfg.imap.password)
     server.select()
     status, data = server.search(None, '(UNSEEN)')
     if status != 'OK':
-        raise Exception('Getting the list of messages resulted in %s' % status)
+        raise Exception(f'Getting the list of messages resulted in {status}')
 
     feed_items = []
-    logging.debug("There are %d UNSEEN items." % len(data[0].split()))
+    logging.debug(f"There are {len(data[0].split())} UNSEEN items.")
     for num in data[0].split():  # For each email message...
         status, data = server.fetch(num, '(BODY.PEEK[HEADER.FIELDS (SUBJECT DATE FROM)])')
         if status != 'OK':
-            raise Exception('Fetching message %s resulted in %s' % (num, status))
-        logging.debug("Fetched message %s." % num)
+            raise Exception(f'Fetching message {num} resulted in {status}')
+        logging.debug(f"Fetched message {num}.")
         msg = email.message_from_bytes(data[0][1])
         subject = msg['Subject']
         from_addr = msg['From']
-        logging.debug("    Subject: %s" % subject)
-        logging.debug("    From: %s" % from_addr)
-        logging.debug("    Date: %s" % msg['Date'])
+        logging.debug(f"    Subject: {subject}")
+        logging.debug(f"    From: {from_addr}")
+        logging.debug(f"    Date: {msg['Date']}")
         codec = 'utf-8'
         if subject.startswith('=?'):
             subject, codec = decode_header(subject)[0]
@@ -122,13 +120,13 @@ def main(feed_dir: str) -> None:
 
     server.close()
     server.logout()
-    logging.info("%2.0fs %s" % (time.time() - start_time, update_status))
+    logging.info(f"{time.time() - start_time:2.0f}s {update_status}")
     v_print(update_status)
 
 
 if __name__ == '__main__':
-    script_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
-    logging.basicConfig(filename=os.path.join(script_dir, g_cfg.main.logfile),
+    logfile = os.path.expanduser(g_cfg.main.logfile)
+    logging.basicConfig(filename=logfile,
                         format='%(asctime)s %(message)s',
                         datefmt='%Y-%m-%d %H:%M',
                         level=logging.INFO)
@@ -137,12 +135,12 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true')
     args = parser.parse_args()
     set_v_print(args.verbose)
-    v_print("Log at %s" % os.path.join(script_dir, g_cfg.main.logfile))
+    v_print(f"Log at {logfile}")
 
     try:
         main(web_dir)
     except Exception as e:
-        exceptional_text = "Exception: " + str(e.__class__) + " " + str(e)
+        exceptional_text = f"Exception: {str(e.__class__)} {str(e)}"
         logging.critical(exceptional_text)
         logging.critical(traceback.format_exc())
         print(exceptional_text)
