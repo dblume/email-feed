@@ -79,7 +79,12 @@ def main(feed_dir):
     """ Fetch all the unread mail, and make a feed of subject lines.
     """
     start_time = time.time()
-    server = imaplib.IMAP4_SSL(g_cfg.imap.mailbox)
+    try:
+        server = imaplib.IMAP4_SSL(g_cfg.imap.mailbox)
+    except Exception as e:
+        logging.critical("%2.0fs imaplib.IMAP4_SSL Exception: %s" % \
+            (time.time() - start_time,  str(e)))
+        return
     server.login(g_cfg.imap.user, g_cfg.imap.password)
     server.select()
     status, data = server.search(None, '(UNSEEN)')
