@@ -60,7 +60,7 @@ email\_feed.cfg looks like this:
 
 This section refers to stuff like the name and location of the new RSS file.
 
-**name**: The name of the person to whom the NetFlix feed belongs.  
+**name**: The name of the person to whom the email feed belongs.  
 **url\_base**: The base of the URL that the RSS feed is at.  
 **logfile**: The name of the logfile.  
 **rss\_base**: The base filename of the RSS file.  '.xml' will be appended to the end.
@@ -73,7 +73,7 @@ This section refers to the mailbox that the script will read to create the feed.
 
 **mailbox**: The IMAP address of the email server.  
 **webmail**: The address of the server's web interface.  
-**user**: The user for the email address to which you've forwarded the NetFlix email.  
+**user**: The email address of the account to watch.  
 **password**: The IMAP password.
 
 ## Maintaining the size of the logfile
